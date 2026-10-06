@@ -1,5 +1,13 @@
 import pyodbc
 from pymongo import MongoClient
+from datetime import datetime
+
+# -----------------------------
+# MIGRATION START TIME
+# -----------------------------
+
+migration_start = datetime.now()
+print(f"Migration started at: {migration_start.strftime('%Y-%m-%d %H:%M:%S')}")
 
 # -----------------------------
 # SQL SERVER CONNECTION
@@ -19,6 +27,7 @@ cursor = sql_conn.cursor()
 # -----------------------------
 
 client = MongoClient("mongodb://localhost:27017")
+
 db = client["MovieNestMongo"]
 
 users_collection = db["users"]
@@ -165,4 +174,12 @@ print(f"Total movies migrated: {len(movies)}")
 sql_conn.close()
 client.close()
 
+# -----------------------------
+# MIGRATION END TIME
+# -----------------------------
+
+migration_end = datetime.now()
+
 print("Migration completed successfully!")
+print(f"Migration finished at: {migration_end.strftime('%Y-%m-%d %H:%M:%S')}")
+print(f"Total migration time: {migration_end - migration_start}")
