@@ -1,17 +1,21 @@
 import pyodbc
 from pymongo import MongoClient
-from datetime import datetime
 
 # -----------------------------
-# MIGRATION START TIME
+# HELPER FUNCTION
 # -----------------------------
 
-migration_start = datetime.now()
-print(f"Migration started at: {migration_start.strftime('%Y-%m-%d %H:%M:%S')}")
+def print_section(title):
+    print("\n" + "=" * 40)
+    print(title)
+    print("=" * 40)
+
 
 # -----------------------------
 # SQL SERVER CONNECTION
 # -----------------------------
+
+print_section("SQL SERVER CONNECTION")
 
 sql_conn = pyodbc.connect(
     "DRIVER={ODBC Driver 17 for SQL Server};"
@@ -22,9 +26,12 @@ sql_conn = pyodbc.connect(
 
 cursor = sql_conn.cursor()
 
+
 # -----------------------------
 # MONGODB CONNECTION
 # -----------------------------
+
+print_section("MONGODB CONNECTION")
 
 client = MongoClient("mongodb://localhost:27017")
 
@@ -37,9 +44,12 @@ movies_collection = db["movies"]
 users_collection.delete_many({})
 movies_collection.delete_many({})
 
+
 # -----------------------------
 # MIGRATE USERS
 # -----------------------------
+
+print_section("MIGRATING USERS")
 
 users_query = """
 SELECT
@@ -84,9 +94,12 @@ users_collection.insert_many(users)
 print("Users migrated successfully!")
 print(f"Total users migrated: {len(users)}")
 
+
 # -----------------------------
 # MIGRATE MOVIES
 # -----------------------------
+
+print_section("MIGRATING MOVIES")
 
 movies_query = """
 SELECT
@@ -167,19 +180,14 @@ movies_collection.insert_many(movies)
 print("Movies migrated successfully!")
 print(f"Total movies migrated: {len(movies)}")
 
+
 # -----------------------------
 # CLOSE CONNECTIONS
 # -----------------------------
 
+print_section("CLOSING CONNECTIONS")
+
 sql_conn.close()
 client.close()
 
-# -----------------------------
-# MIGRATION END TIME
-# -----------------------------
-
-migration_end = datetime.now()
-
 print("Migration completed successfully!")
-print(f"Migration finished at: {migration_end.strftime('%Y-%m-%d %H:%M:%S')}")
-print(f"Total migration time: {migration_end - migration_start}")
